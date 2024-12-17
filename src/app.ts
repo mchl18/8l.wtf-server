@@ -51,8 +51,8 @@ export const app = (app = express()): Express => {
               const expiresAt = await db.get(`${shortId}:expires`);
               res.json({
                 shortId,
-                fullUrl: `${hostUrl}?shortId=${shortId}`,
-                deleteProxyUrl: `${hostUrl}/delete-proxy?shortId=${shortId}`,
+                fullUrl: `${hostUrl}?q=${shortId}`,
+                deleteProxyUrl: `${hostUrl}/delete-proxy?q=${shortId}`,
                 isEncrypted: false,
                 expiresAt: expiresAt
                   ? new Date(expiresAt as string).toISOString()
@@ -95,8 +95,8 @@ export const app = (app = express()): Express => {
 
         res.json({
           shortId,
-          fullUrl: `${hostUrl}?shortId=${shortId}`,
-          deleteProxyUrl: `${hostUrl}/delete-proxy?shortId=${shortId}`,
+          fullUrl: `${hostUrl}?q=${shortId}`,
+          deleteProxyUrl: `${hostUrl}/delete-proxy?q=${shortId}`,
           isEncrypted: !!seed,
           expiresAt,
         });
@@ -148,8 +148,8 @@ export const app = (app = express()): Express => {
           res.json({
             shortId,
             url,
-            fullUrl: `${hostUrl}?shortId=${shortId}`,
-            deleteProxyUrl: `${hostUrl}/delete-proxy?shortId=${shortId}`,
+            fullUrl: `${hostUrl}?q=${shortId}`,
+            deleteProxyUrl: `${hostUrl}/delete-proxy?q=${shortId}`,
             isEncrypted: false,
             expiresAt: expiresAt
               ? new Date(expiresAt as string).toISOString()
@@ -174,8 +174,8 @@ export const app = (app = express()): Express => {
         res.json({
           shortId,
           url: encryptedUrl,
-          fullUrl: `${hostUrl}?shortId=${shortId}`,
-          deleteProxyUrl: `${hostUrl}/delete-proxy?shortId=${shortId}`,
+          fullUrl: `${hostUrl}?q=${shortId}`,
+          deleteProxyUrl: `${hostUrl}/delete-proxy?q=${shortId}`,
           isEncrypted: true,
           expiresAt: expiresAt
             ? new Date(expiresAt as string).toISOString()
@@ -225,8 +225,8 @@ export const app = (app = express()): Express => {
               urls.push({
                 shortId,
                 url: encryptedUrl,
-                fullUrl: `${hostUrl}?shortId= ${shortId}`,
-                deleteProxyUrl: `${hostUrl}/delete-proxy?shortId=${shortId}`,
+                fullUrl: `${hostUrl}?q= ${shortId}`,
+                deleteProxyUrl: `${hostUrl}/delete-proxy?q=${shortId}`,
                 isEncrypted: true,
                 expiresAt: expiresAt
                   ? new Date(expiresAt as string).toISOString()
