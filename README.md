@@ -1,5 +1,8 @@
 # An Express + Typescript + Mocha + Nyc + Eslint + Nodemon + Prettier Template Generator
 
+
+![Uptime](https://status.mgerullis.com/api/badge/1/uptime?style=flat-square)
+
 This is a template for expressjs + typescript projects. It bootstraps a template project with [some popular packages](#Configuration-Files) and some pre-configured [npm script commands](#NPM-Scripts).
 
 The entry point of the app is `src/server.ts`
