@@ -31,6 +31,10 @@ export const app = (app = express()): Express => {
   app.use(nocache());
   app.use(cookieParser());
 
+  app.get("/health", (req, res) => {
+    res.json({ status: "ok" });
+  });
+
   // Shorten URL endpoint
   app.post(
     "/api/shorten",
