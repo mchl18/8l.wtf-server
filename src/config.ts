@@ -1,5 +1,8 @@
 import { ValidationResult } from '@hapi/joi';
 import { configSchema } from 'src/validation-schemas/config-schema';
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 const { CORS_ORIGIN, LOG_LEVEL, PORT, LOG_TRANSPORTS, NODE_ENV } = process.env;
 
