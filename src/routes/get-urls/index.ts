@@ -29,7 +29,6 @@ router.post("/get-urls", async (req: Request, res: Response) => {
       if (!isDeleted) {
         const encryptedUrl = await db.get(shortId);
         const expiresAt = await db.get(`${shortId}:expires`);
-        debugger
         if (encryptedUrl) {
           urls.push({
             shortId,
@@ -37,6 +36,7 @@ router.post("/get-urls", async (req: Request, res: Response) => {
             fullUrl: `${hostUrl}?q=${shortId}`,
             deleteProxyUrl: `${hostUrl}/delete-proxy?q=${shortId}`,
             isEncrypted: metadata?.isEncrypted || false,
+            seed: seed || '',
             expiresAt: expiresAt
               ? new Date(expiresAt as string).toISOString()
               : undefined,
