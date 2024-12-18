@@ -8,7 +8,7 @@ const { CORS_ORIGIN, LOG_LEVEL, PORT, LOG_TRANSPORTS, NODE_ENV } = process.env;
 
 const { value, error } = configSchema.validate({
   rootDir: process.cwd(),
-  apiPrefix: '/v1',
+  apiPrefix: '/api',
   nodeEnv: NODE_ENV,
   port: PORT ?? 3000,
   cors: {
