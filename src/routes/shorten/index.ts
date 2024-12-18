@@ -1,40 +1,41 @@
 import { Router, Request, Response } from "express";
-// import nocache from 'nocache';
 import { getDatabase } from "src/lib/adapters";
 import { getHostUrl, validateEncryptedSeedFormat } from "src/lib/utils";
 import * as nanoid from "nanoid";
-
-// import cacheForever from 'src/middleware/cache-forever';
 
 const router = Router();
 
 // Shorten URL endpoint
 router.post("/shorten", async (req: Request, res: Response) => {
   try {
-    const { url, maxAge, seed } = req.body;
+    const { url, maxAge, seed, isEncrypted } = req.body;
     const hostUrl = getHostUrl();
     const db = await getDatabase();
 
-    const urlsSet = seed ? "authenticated_urls" : "anonymous_urls";
+    const urlsSet = isEncrypted ? "encrypted_urls" : "anonymous_urls";
 
     // Check for existing anonymous URLs
-    if (!seed) {
-      const existingEntries = await db.smembers("anonymous_urls");
-      for (const entry of existingEntries) {
-        const [shortId, storedUrl] = entry.split("::");
-        if (storedUrl === url) {
-          const expiresAt = await db.get(`${shortId}:expires`);
-          res.json({
-            shortId,
-            fullUrl: `${hostUrl}?q=${shortId}`,
-            deleteProxyUrl: `${hostUrl}/delete-proxy?q=${shortId}`,
-            isEncrypted: false,
-            expiresAt: expiresAt
-              ? new Date(expiresAt as string).toISOString()
-              : undefined,
-          });
-          return;
-        }
+    const existingEntries = await db.smembers(urlsSet);
+
+    for (const entry of existingEntries) {
+      const [shortId, storedUrl] = entry.split("::");
+      if (storedUrl === url) {
+        const expiresAt = await db.get(`${shortId}:expires`);
+        const metadata = await db.get<{ isEncrypted: boolean }>(
+          `url:${shortId}:meta`
+        );
+
+        res.json({
+          shortId,
+          fullUrl: `${hostUrl}?q=${shortId}`,
+          deleteProxyUrl: `${hostUrl}/delete-proxy?q=${shortId}`,
+          isEncrypted: metadata?.isEncrypted || false,
+          seed: seed || undefined,
+          expiresAt: expiresAt
+            ? new Date(expiresAt as string).toISOString()
+            : undefined,
+        });
+        return;
       }
     }
 
@@ -51,8 +52,10 @@ router.post("/shorten", async (req: Request, res: Response) => {
       shortId = nanoid.nanoid(idLength);
       existingUrl = await db.get(shortId);
     } while (existingUrl);
-
-    await db.set(`url:${shortId}:meta`, { authenticated: !!seed });
+    await db.set(`url:${shortId}:meta`, {
+      seed: seed || undefined,
+      isEncrypted,
+    });
     await db.sadd(urlsSet, `${shortId}::${url}`);
 
     if (seed) {
@@ -72,7 +75,8 @@ router.post("/shorten", async (req: Request, res: Response) => {
       shortId,
       fullUrl: `${hostUrl}?q=${shortId}`,
       deleteProxyUrl: `${hostUrl}/delete-proxy?q=${shortId}`,
-      isEncrypted: !!seed,
+      isEncrypted: isEncrypted,
+      seed: seed || undefined,
       expiresAt,
     });
     return;

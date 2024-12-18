@@ -1,9 +1,6 @@
 import { Router, Request, Response } from "express";
-// import nocache from 'nocache';
 import { getDatabase } from "src/lib/adapters";
 import { getHostUrl } from "src/lib/utils";
-
-// import cacheForever from 'src/middleware/cache-forever';
 
 const router = Router();
 
@@ -23,7 +20,7 @@ router.post("/get-urls", async (req: Request, res: Response) => {
     const urls = [];
 
     for (const shortId of shortIds) {
-      const metadata = await db.get<{ deleted: boolean }>(
+      const metadata = await db.get<{ deleted: boolean, isEncrypted: boolean }>(
         `url:${shortId}:meta`
       );
       const isDeleted =
@@ -32,14 +29,14 @@ router.post("/get-urls", async (req: Request, res: Response) => {
       if (!isDeleted) {
         const encryptedUrl = await db.get(shortId);
         const expiresAt = await db.get(`${shortId}:expires`);
-
+        debugger
         if (encryptedUrl) {
           urls.push({
             shortId,
             url: encryptedUrl,
-            fullUrl: `${hostUrl}?q= ${shortId}`,
+            fullUrl: `${hostUrl}?q=${shortId}`,
             deleteProxyUrl: `${hostUrl}/delete-proxy?q=${shortId}`,
-            isEncrypted: true,
+            isEncrypted: metadata?.isEncrypted || false,
             expiresAt: expiresAt
               ? new Date(expiresAt as string).toISOString()
               : undefined,

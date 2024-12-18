@@ -1,10 +1,6 @@
 import { Router, Request, Response } from "express";
-// import nocache from 'nocache';
 import { getDatabase } from "src/lib/adapters";
 import { getHostUrl, validateEncryptedSeedFormat } from "src/lib/utils";
-import * as nanoid from "nanoid";
-
-// import cacheForever from 'src/middleware/cache-forever';
 
 const router = Router();
 
@@ -28,16 +24,16 @@ router.post(
 
       const [meta, url, expiresAt, isUrlOwnedBySeed, encryptedUrl] =
         await Promise.all([
-          transaction.get<{ authenticated: boolean }>(`url:${shortId}:meta`),
+          transaction.get<{ isEncrypted: boolean }>(`url:${shortId}:meta`),
           transaction.get(shortId),
           transaction.get(`${shortId}:expires`),
           transaction.sismember(`token:${seed}:urls`, shortId),
           transaction.get(shortId),
         ]);
 
-      const isAuthenticated = meta?.authenticated;
+      const isEncrypted = meta?.isEncrypted;
 
-      if (!isAuthenticated) {
+      if (!isEncrypted) {
         if (!url) {
           await transaction.rollback();
           res.status(404).json({ error: "URL not found" });
