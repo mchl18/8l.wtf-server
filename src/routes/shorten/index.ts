@@ -1,6 +1,6 @@
 import { Router, Request, Response } from "express";
-import { getDatabase } from "src/lib/adapters";
-import { getHostUrl, validateEncryptedSeedFormat } from "src/lib/utils";
+import { database } from "src/lib/adapters";
+import { getHostUrl } from "src/lib/utils";
 import * as nanoid from "nanoid";
 
 const router = Router();
@@ -10,7 +10,7 @@ router.post("/shorten", async (req: Request, res: Response) => {
   try {
     const { url, maxAge, seed, isEncrypted } = req.body;
     const hostUrl = getHostUrl();
-    const db = await getDatabase();
+    const db = await database;
 
     const urlsSet = isEncrypted ? "encrypted_urls" : "anonymous_urls";
 
@@ -39,7 +39,7 @@ router.post("/shorten", async (req: Request, res: Response) => {
       }
     }
 
-    if (seed && !validateEncryptedSeedFormat(seed)) {
+    if (!seed) {
       res.status(401).json({ error: "Invalid seed" });
       return;
     }

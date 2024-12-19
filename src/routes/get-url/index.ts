@@ -1,6 +1,6 @@
 import { Router, Request, Response } from "express";
-import { getDatabase } from "src/lib/adapters";
-import { getHostUrl, validateEncryptedSeedFormat } from "src/lib/utils";
+import { database } from "src/lib/adapters";
+import { getHostUrl } from "src/lib/utils";
 
 const router = Router();
 
@@ -16,7 +16,7 @@ router.post(
     }
 
     const hostUrl = getHostUrl();
-    const db = await getDatabase();
+    const db = await database;
     let transaction = null;
 
     try {
@@ -54,7 +54,7 @@ router.post(
         return;
       }
 
-      if (!seed || !validateEncryptedSeedFormat(seed)) {
+      if (!seed) {
         await transaction.rollback();
         res.status(401).json({ error: "Invalid seed" });
         return;

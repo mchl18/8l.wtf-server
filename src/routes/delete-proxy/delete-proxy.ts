@@ -1,6 +1,6 @@
 import { Router, Request, Response } from "express";
 // import nocache from 'nocache';
-import { getDatabase } from "src/lib/adapters";
+import { database } from "src/lib/adapters";
 // import cacheForever from 'src/middleware/cache-forever';
 
 const router = Router();
@@ -9,7 +9,7 @@ const router = Router();
 router.post("/delete-proxy", async (req: Request, res: Response) => {
   try {
     const { id } = req.body;
-    const db = await getDatabase();
+    const db = await database;
     const url = await db.get(id);
 
     if (!url) {

@@ -5,15 +5,16 @@ import { createMysqlAdapter } from "./mysql-adapter.js";
 import { createSqliteAdapter } from "./sqlite-adapter.js";
 import { createKvAdapter, createRedisAdapter } from "./redis-adapter.js";
 let db: DbAdapter;
-export const getDatabase = async ({
+const envType = process.env.NEXT_PUBLIC_DB_TYPE;
+
+const getDatabase = async ({
   type,
 }: {
   type?: DbType;
-} = {}): Promise<DbAdapter> => {
+} = {}) => {
   if (db) {
     return db;
   }
-  console.log("getDatabase", type);
   if (type === "vercel-kv") {
     if (!process.env.KV_URL) {
       throw new Error("KV_URL is not set");
@@ -68,7 +69,19 @@ export const getDatabase = async ({
     db = sqlite;
     return sqlite;
   }
-  const envType = process.env.NEXT_PUBLIC_DB_TYPE;
+  if (!envType) {
+    throw new Error("Database type not set");
+  }
+  return getDatabase({
+    type: envType as DbType,
+  });
+};
+
+export const database = (async ({
+  type,
+}: {
+  type?: DbType;
+} = {}): Promise<DbAdapter> => {
   if (!type && envType) {
     if (
       ["vercel-kv", "redis", "mongo", "postgres", "mysql", "sqlite"].includes(
@@ -90,4 +103,4 @@ export const getDatabase = async ({
     return db;
   }
   throw new Error("Database type not set");
-};
+})();

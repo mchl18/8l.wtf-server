@@ -1,5 +1,5 @@
 import { Router, Request, Response } from "express";
-import { getDatabase } from "src/lib/adapters";
+import { database } from "src/lib/adapters";
 import { getHostUrl } from "src/lib/utils";
 
 const router = Router();
@@ -15,12 +15,12 @@ router.post("/get-urls", async (req: Request, res: Response) => {
     }
 
     const hostUrl = getHostUrl();
-    const db = await getDatabase();
+    const db = await database;
     const shortIds = await db.smembers(`token:${seed}:urls`);
     const urls = [];
 
     for (const shortId of shortIds) {
-      const metadata = await db.get<{ deleted: boolean, isEncrypted: boolean }>(
+      const metadata = await db.get<{ deleted: boolean; isEncrypted: boolean }>(
         `url:${shortId}:meta`
       );
       const isDeleted =
@@ -36,7 +36,7 @@ router.post("/get-urls", async (req: Request, res: Response) => {
             fullUrl: `${hostUrl}?q=${shortId}`,
             deleteProxyUrl: `${hostUrl}/delete-proxy?q=${shortId}`,
             isEncrypted: metadata?.isEncrypted || false,
-            seed: seed || '',
+            seed: seed || "",
             expiresAt: expiresAt
               ? new Date(expiresAt as string).toISOString()
               : undefined,
