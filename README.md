@@ -57,3 +57,14 @@ Health check endpoint
 - Redis for data storage
 - QRCode for QR generation
 - Various security middleware (helmet, cors, etc)
+
+## TODO
+
+- [ ] add challenges instead of seed checking
+- [ ] fix delete proxy
+- [ ] more input validation
+- [ ] add more tests
+- [ ] add more logging
+- [ ] add more metrics
+- [ ] add more error handling
+- [ ] add more documentation

@@ -37,15 +37,20 @@ router.post("/get-url", async (req: Request, res: Response) => {
       }
 
       await transaction.commit();
+      const expiresAtAsDate = expiresAt
+        ? new Date(expiresAt as string)
+        : undefined;
+      if (expiresAtAsDate?.toString() === "Invalid Date") {
+        res.status(404).json({ error: "URL not found" });
+        return;
+      }
       res.json({
         shortId,
         url,
         fullUrl: `${hostUrl}?q=${shortId}`,
         deleteProxyUrl: `${hostUrl}/delete-proxy?q=${shortId}`,
         isEncrypted: false,
-        expiresAt: expiresAt
-          ? new Date(expiresAt as string).toISOString()
-          : undefined,
+        expiresAt: expiresAtAsDate?.toISOString() || undefined,
       });
       return;
     }
@@ -63,15 +68,20 @@ router.post("/get-url", async (req: Request, res: Response) => {
     }
 
     await transaction.commit();
+    const expiresAtAsDate = expiresAt
+      ? new Date(expiresAt as string)
+      : undefined;
+    if (expiresAtAsDate?.toString() === "Invalid Date") {
+      res.status(404).json({ error: "URL not found" });
+      return;
+    }
     res.json({
       shortId,
       url,
       fullUrl: `${hostUrl}?q=${shortId}`,
       deleteProxyUrl: `${hostUrl}/delete-proxy?q=${shortId}`,
       isEncrypted: true,
-      expiresAt: expiresAt
-        ? new Date(expiresAt as string).toISOString()
-        : undefined,
+      expiresAt: expiresAtAsDate ? expiresAtAsDate.toISOString() : undefined,
     });
   } catch (error) {
     console.error("Error in get-url:", error);

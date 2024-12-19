@@ -24,16 +24,19 @@ router.post("/shorten", async (req: Request, res: Response) => {
         const metadata = await db.get<{ isEncrypted: boolean }>(
           `url:${shortId}:meta`
         );
-
+        const expiresAtAsDate = expiresAt
+          ? new Date(expiresAt as string)
+          : undefined;
+        if (expiresAtAsDate?.toString() === "Invalid Date") {
+          continue;
+        }
         res.json({
           shortId,
           fullUrl: `${hostUrl}?q=${shortId}`,
           deleteProxyUrl: `${hostUrl}/delete-proxy?q=${shortId}`,
           isEncrypted: metadata?.isEncrypted || false,
           seed: seed || undefined,
-          expiresAt: expiresAt
-            ? new Date(expiresAt as string).toISOString()
-            : undefined,
+          expiresAt: expiresAtAsDate?.toISOString() || undefined,
         });
         return;
       }
@@ -63,10 +66,15 @@ router.post("/shorten", async (req: Request, res: Response) => {
     }
 
     let expiresAt;
-    if (maxAge && typeof maxAge === "number") {
-      expiresAt = new Date(Date.now() + maxAge).toISOString();
-      await db.set(shortId, url, { ex: Math.floor(maxAge) });
-      await db.set(`${shortId}:expires`, expiresAt);
+    if (maxAge) {
+      if (typeof maxAge === "number" && maxAge > 0) {
+        expiresAt = new Date(Date.now() + maxAge).toISOString();
+        await db.set(shortId, url, { ex: Math.floor(maxAge) });
+        await db.set(`${shortId}:expires`, expiresAt);
+      } else {
+        res.status(400).json({ error: "Invalid maxAge" });
+        return;
+      }
     } else {
       await db.set(shortId, url);
     }
@@ -76,7 +84,7 @@ router.post("/shorten", async (req: Request, res: Response) => {
       fullUrl: `${hostUrl}?q=${shortId}`,
       deleteProxyUrl: `${hostUrl}/delete-proxy?q=${shortId}`,
       isEncrypted: isEncrypted,
-      seed: seed || undefined,
+      seed,
       expiresAt,
     });
     return;
