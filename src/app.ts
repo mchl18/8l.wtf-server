@@ -1,5 +1,5 @@
 import express, { Express } from "express";
-import "express-async-errors";
+// import "express-async-errors";
 import helmet from "helmet";
 import cors from "cors";
 import nocache from "nocache";
@@ -21,10 +21,6 @@ export const app = (app = express()): Express => {
   app.use(helmet());
   app.use(nocache());
   app.use(cookieParser());
-
-  app.get("/health", (req, res) => {
-    res.json({ status: "ok" });
-  });
 
   bootstrap(app);
 

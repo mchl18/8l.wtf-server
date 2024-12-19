@@ -7,7 +7,6 @@
         "test": "tests"
     },
     "scripts": {
-        "start:pm2": "pm2 start",
         "start": "cross-env NODE_PATH=./dist node .",
         "build": "rimraf -fr ./dist/* && tsc",
         "test": "cross-env NODE_PATH=. nyc mocha -- \"tests/**/*.{test,spec}.ts\"",
@@ -70,7 +69,6 @@
         "cors": "^2.8.5",
         "dotenv": "^16.4.7",
         "express": "^4.21.2",
-        "express-async-errors": "^3.1.1",
         "helmet": "^8.0.0",
         "ioredis": "^5.4.1",
         "mongodb": "^6.12.0",
@@ -78,7 +76,6 @@
         "nanoid": "3",
         "nocache": "^4.0.0",
         "pg": "^8.13.1",
-        "pm2": "^5.4.3",
         "qrcode": "^1.5.4",
         "sqlite": "^5.1.1",
         "sqlite3": "^5.1.7",
